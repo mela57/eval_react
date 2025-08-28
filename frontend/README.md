@@ -1,3 +1,17 @@
+# React Evaluation
+
+## Informations importantes
+
+Lors du lancement du site :
+- Un utilisateur **user** et un utilisateur **admin** sont créés automatiquement.
+- Il suffit simplement d’ajouter la collection `users` dans **MongoDB** pour que le système fonctionne.
+
+## Lancement du projet
+```bash
+npm install
+npm start   # ou npm run dev selon la config
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

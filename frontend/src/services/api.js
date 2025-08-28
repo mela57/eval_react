@@ -10,7 +10,7 @@ const api = axios.create({
   },
 });
 
-// Intercepteur pour ajouter le token d'authentification à chaque requête
+// Intercepteur pour ajout token 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('authToken');
   if (token) {
@@ -19,38 +19,24 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-
-
 // Service pour les conférences
 export const conferenceService = {
-  // Récupérer toutes les conférences
   getAllConferences: () => api.get('/conferences'),
-  
-  // Récupérer une conférence par ID
   getConferenceById: (id) => api.get(`/conference/${id}`),
-  
-  // Créer une nouvelle conférence (admin seulement)
-  createConference: (conferenceData) => api.post('/conference', { conference: conferenceData }),
-  
-  // Modifier une conférence (admin seulement)
-  updateConference: (id, conferenceData) => api.patch(`/conference?id=${id}`, { conference: conferenceData }),
-  
-  // Supprimer une conférence (admin seulement)
-  deleteConference: (id) => api.delete(`/conference?id=${id}`)
+  createConference: (conferenceData) => api.post('/conference', conferenceData),
+  updateConference: (id, conferenceData) => api.patch(`/conference/${id}`, conferenceData),
+  deleteConference: (id) => api.delete(`/conference/${id}`)
 };
 
-// Service pour l'authentification
+// Service auth
 export const authService = {
   // Connexion
   login: (credentials) => api.post('/login', credentials),
-  
   // Inscription
   register: (userData) => api.post('/signup', userData),
-  
-  // Vérifier si l'utilisateur est admin
+  // Vérifie si l'utilisateur est admin
   isAdmin: () => api.get('/isadmin'),
-  
-  // Récupérer les infos de l'utilisateur connecté depuis le token
+  // Récupére les infos de l'utilisateur connecté depuis le token
   getCurrentUser: () => {
     const token = localStorage.getItem('authToken');
     if (token) {
@@ -66,18 +52,11 @@ export const authService = {
   }
 };
 
-// Service pour les utilisateurs
+// Service  utilisateurs
 export const userService = {
-  // Récupérer tous les utilisateurs
   getAllUsers: () => api.get('/users'),
-  
-  // Promouvoir un utilisateur en admin
-  changeUserType: (userId, newType) => api.patch(`/usertype?id=${userId}`, { newType }),
-  
-  // Supprimer un utilisateur
-  deleteUser: (userId) => api.delete(`/user?id=${userId}`),
-  
-  // Changer le mot de passe
+  changeUserType: (userId, newType) => api.patch(`/usertype/${userId}`, { newType }),
+  deleteUser: (userId) => api.delete(`/user/${userId}`),
   changePassword: (oldPassword, password) => api.patch('/userpassword', { oldPassword, password })
 };
 

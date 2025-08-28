@@ -14,36 +14,57 @@ function App() {
   const [selectedConferenceId, setSelectedConferenceId] = useState(null);
   const [loading, setLoading] = useState(true);
 
-useEffect(() => {
-  const initializeAuth = async () => {
-    try {
-      const token = localStorage.getItem('authToken');
-      if (token) {
-        // Utiliser la nouvelle fonction pour récupérer le vrai type d'utilisateur
+  useEffect(() => {
+    const initializeAuth = async () => {
+      try {
+        const token = localStorage.getItem('authToken');
+        
+        if (!token) {
+          // creation compte admin et user 
+          console.log('Création des comptes utilisateurs...');
+          
+          try {
+            await authService.register({ id: 'admin', password: 'admin' });
+            console.log('Compte admin créé');
+          } catch (err) {
+            console.log('Compte admin existe déjà');
+          }
+          
+          try {
+            await authService.register({ id: 'user', password: 'user' });
+            console.log('Compte user créé');
+          } catch (err) {
+            console.log('Compte user existe déjà');
+          }
+          
+          // Connexion admin par défaut
+          const loginResponse = await authService.login({ id: 'admin', password: 'admin' });
+          localStorage.setItem('authToken', loginResponse.data);
+        }
+        
         const userInfo = authService.getCurrentUser();
         if (userInfo) {
           setUser(userInfo);
         }
+        
+      } catch (error) {
+        console.error('Erreur initialisation auth:', error);
       }
-    } catch (error) {
-      console.error('Erreur initialisation auth:', error);
-    }
-    setLoading(false);
-  };
+      setLoading(false);
+    };
 
-  initializeAuth();
-}, []);
-const handleLogin = (userId) => {
-  // Après connexion réussie, récupérer les vraies infos utilisateur
-  const userInfo = authService.getCurrentUser();
-  if (userInfo) {
-    setUser(userInfo);
-  } else {
-    // Fallback si on n'arrive pas à décoder le token
-    setUser({ id: userId, type: 'user' });
-  }
-  setCurrentPage('home');
-};
+    initializeAuth();
+  }, []);
+
+  const handleLogin = (userId) => {
+    const userInfo = authService.getCurrentUser();
+    if (userInfo) {
+      setUser(userInfo);
+    } else {
+      setUser({ id: userId, type: 'user' });
+    }
+    setCurrentPage('home');
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('authToken');
@@ -90,12 +111,12 @@ const handleLogin = (userId) => {
           />
         )}
         
-        {currentPage === 'admin-conferences' && user && user.type === 'admin' &&  (
-            <AdminConferences />
-        )}
-        
+{currentPage === 'admin-conferences' && user && user.type === 'admin' && (
+  <AdminConferences user={user} />
+)}
+
         {currentPage === 'admin-users' && user && user.type === 'admin' && (
-            <AdminUsers />
+          <AdminUsers />
         )}
 
         {(currentPage === 'admin-conferences' || currentPage === 'admin-users') && (!user || user.type !== 'admin') && (
